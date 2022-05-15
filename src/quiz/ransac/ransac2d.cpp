@@ -122,6 +122,53 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
 
 }
 
+std::unordered_set<int> Ransac3D(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int maxIterations, float distanceTol)
+{
+	std::unordered_set<int> inliersResult;
+	srand(time(NULL));
+	
+
+	while(maxIterations--)
+	{
+		pcl::PointXYZ point1;
+		pcl::PointXYZ point2;
+		pcl::PointXYZ point3;
+		std::unordered_set<int> temp;
+
+		point1 = cloud->points[rand()%cloud->points.size()];
+		point2 = cloud->points[rand()%cloud->points.size()];
+		point3 = cloud->points[rand()%cloud->points.size()];
+
+		float A = (point2.y - point1.y)* (point3.z - point1.z) - (point2.z - point1.z)*(point3.y - point1.y);
+		float B = (point2.z - point1.z)* (point3.x - point1.x) - (point2.x - point1.x)*(point3.z - point1.z);
+		float C = (point2.x - point1.x)* (point3.y - point1.y) - (point2.y - point1.y)*(point3.x - point1.x);
+		float D = - ( A * point1.x + B * point1.y + C * point1.z);
+
+		for(int i = 0; (cloud->points.size() - i) >0 ; i++)
+		{
+			float distance = abs(A*cloud->points[i].x + B*cloud->points[i].y + C*cloud->points[i].z + D )  / sqrt(A*A + B*B + C*C) ;
+			
+			if (distance < distanceTol)
+			{
+				temp.insert(i);
+			}
+		}
+		cout << "point1.x = " << point1.x << endl; 
+		cout << "temp = "<< temp.size() << endl;
+		cout << "inliersResult = "<< inliersResult.size() << endl;
+
+
+		if(temp.size() > inliersResult.size())
+		{
+			inliersResult = temp;
+		}
+		
+	} 
+	
+	return inliersResult;
+
+}
+
 int main ()
 {
 
@@ -129,11 +176,14 @@ int main ()
 	pcl::visualization::PCLVisualizer::Ptr viewer = initScene();
 
 	// Create data
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud = CreateData();
+	//pcl::PointCloud<pcl::PointXYZ>::Ptr cloud = CreateData();
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud = CreateData3D();
 	
 
 	// TODO: Change the max iteration and distance tolerance arguments for Ransac function
-	std::unordered_set<int> inliers = Ransac(cloud, 50, 0.5);
+	//std::unordered_set<int> inliers = Ransac(cloud, 50, 0.5);
+	std::unordered_set<int> inliers = Ransac3D(cloud, 50, 0.5);
+
 
 	pcl::PointCloud<pcl::PointXYZ>::Ptr  cloudInliers(new pcl::PointCloud<pcl::PointXYZ>());
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloudOutliers(new pcl::PointCloud<pcl::PointXYZ>());
