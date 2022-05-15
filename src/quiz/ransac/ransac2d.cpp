@@ -67,6 +67,47 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
 	srand(time(NULL));
 	
 	// TODO: Fill in this function
+	
+	//랜덤하게 두 점을 뽑고, 라인을 그리고, 전체 점간의 길이를 재서 distol이하의 점을을 추출한다
+	//개수를 새고
+	//이걸 maxiterations 만큼 해서 개수가 더 많으면 새로 저장한다 
+
+	while(maxIterations--)
+	{
+		pcl::PointXYZ point1;
+		pcl::PointXYZ point2;
+		std::unordered_set<int> temp;
+
+		point1 = cloud->points[rand()%cloud->points.size()];
+		point2 = cloud->points[rand()%cloud->points.size()];
+
+
+		double A = point1.y - point2.y;
+		double B = point2.x - point1.x;
+		double C = point1.x * point2.y - point2.x * point1.y;
+		
+
+		for(int i = 0; (cloud->points.size() - i) >0 ; i++)
+		{
+			double distance = abs(A * cloud->points[i].x +B * cloud->points[i].y +C) / sqrt(A*A + B*B);
+			
+			if (distance < distanceTol)
+			{
+				temp.insert(i);
+			}
+		}
+		cout << "point1.x = " << point1.x << endl; 
+		cout << "temp = "<< temp.size() << endl;
+		cout << "inliersResult = "<< inliersResult.size() << endl;
+
+
+		if(temp.size() > inliersResult.size())
+		{
+			inliersResult = temp;
+		}
+		
+	} 
+	
 
 	// For max iterations 
 
@@ -92,7 +133,7 @@ int main ()
 	
 
 	// TODO: Change the max iteration and distance tolerance arguments for Ransac function
-	std::unordered_set<int> inliers = Ransac(cloud, 0, 0);
+	std::unordered_set<int> inliers = Ransac(cloud, 50, 0.5);
 
 	pcl::PointCloud<pcl::PointXYZ>::Ptr  cloudInliers(new pcl::PointCloud<pcl::PointXYZ>());
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloudOutliers(new pcl::PointCloud<pcl::PointXYZ>());
