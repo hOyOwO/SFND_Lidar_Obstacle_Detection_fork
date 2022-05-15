@@ -128,21 +128,20 @@ std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::C
 
     for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin(); it != cluster_indices.end(); ++it)
     {
-        pcl::PointCloud<PointT>::Ptr temp = new (pcl::PointCloud<PointT>);
+        //pcl::PointCloud<pcl::PointXYZ>::Ptr cluster_cloud = new (pcl::PointCloud<pcl::PointXYZ>());
+        pcl::PointCloud<pcl::PointXYZ>::Ptr cluster_cloud (new pcl::PointCloud<pcl::PointXYZ>);
         for (const auto& idx : it->indices)
         {
-            temp->push_back((*cloud)[idx]);
+            cluster_cloud->push_back((*cloud)[idx]);
         }
 
-        clusters.push_back(temp);
-/*
-        clusters->width = clusters->size ();
-        clusters->height = 1;
-        clusters->is_dense = true;
+        cluster_cloud->width = cluster_cloud->size ();
+        cluster_cloud->height = 1;
+        cluster_cloud->is_dense = true;
 
-        std::cout << "PointCloud representing the Cluster: " << clusters->size () << " data points." << std::endl;
- */
-
+        std::cout << "PointCloud representing the Cluster: " << cluster_cloud->size () << " data points." << std::endl;
+ 
+        clusters.push_back(cluster_cloud);
     }
 
 
