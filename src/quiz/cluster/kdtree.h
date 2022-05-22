@@ -79,9 +79,9 @@ struct KdTree
 						ids.push_back(node->id);
 						//cout << node->id << endl;
 				}
-				if ( target[depth%2]- distanceTol <  node->point[depth%2]) // node가 오른쪽에 있을때 왼쪽을 살림
+				if ( target[depth%2]- distanceTol <  node->point[depth%2]) // target의 최소값보다 node가 오른쪽에 있을때 node의 왼쪽을 살림
 					searchHelper(target, node->left, depth+1, distanceTol, ids);
-				if ( target[depth%2] + distanceTol >  node->point[depth%2]) // node가 왼쪽에 있을때 오른쪽을 살림
+				if ( target[depth%2] + distanceTol >  node->point[depth%2]) // target의 최대값보다 node가 왼쪽에 있을때 node의 오른쪽을 살림
 					searchHelper(target, node->right, depth+1, distanceTol, ids);
 				 
 			}
