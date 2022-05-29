@@ -41,19 +41,22 @@ typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(ty
     sor.filter (*cloud_filtered);
     
     //CropBox
-    /*
+    typename pcl::PointCloud<PointT>::Ptr cloud_cropped (new pcl::PointCloud<PointT>());
+    
     pcl::CropBox<PointT> crop;
+    crop.setInputCloud (cloud_filtered);
     crop.setMin (minPoint);
     crop.setMax (maxPoint);
-    crop.applyFilter (*cloud_filtered);
-    */
+    crop.filter (*cloud_cropped);
+        
 
     auto endTime = std::chrono::steady_clock::now();
     auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
     std::cout << "filtering took " << elapsedTime.count() << " milliseconds" << std::endl;
 
     //return cloud;
-    return cloud_filtered;
+    //return cloud_filtered;
+    return cloud_cropped;
 
 }
 
