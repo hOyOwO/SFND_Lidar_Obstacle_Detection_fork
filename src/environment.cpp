@@ -96,7 +96,9 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
 
   ProcessPointClouds<pcl::PointXYZI>* pointProcessorI = new ProcessPointClouds<pcl::PointXYZI>();
   pcl::PointCloud<pcl::PointXYZI>::Ptr inputCloud = pointProcessorI->loadPcd("../src/sensors/data/pcd/data_1/0000000000.pcd");
-  renderPointCloud(viewer,inputCloud,"inputCloud");
+  //renderPointCloud(viewer,inputCloud,"inputCloud");
+  pcl::PointCloud<pcl::PointXYZI>::Ptr filterCloud = pointProcessorI->FilterCloud(inputCloud, 0.01 , Eigen::Vector4f (100, 100, 100, 1), Eigen::Vector4f (-100, -100, -100, 1));
+  renderPointCloud(viewer,filterCloud,"filterCloud");
 }
 
 
@@ -133,7 +135,7 @@ int main (int argc, char** argv)
     initCamera(setAngle, viewer);
     //simpleHighway(viewer);
     cityBlock(viewer);
-    
+
 
     while (!viewer->wasStopped ())
     {
