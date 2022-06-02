@@ -1,6 +1,8 @@
 // PCL lib Functions for processing point clouds 
 
 #include "processPointClouds.h"
+#include "quiz/cluster/kdtree.h"
+
 
 
 //constructor:
@@ -121,6 +123,60 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
     return segResult;
 }
 
+template<typename PointT>
+std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::SegmentPlane_hyw(typename pcl::PointCloud<PointT>::Ptr cloud, int maxIterations, float distanceThreshold)
+{
+
+	std::unordered_set<int> inliersResult;
+    pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
+	
+    srand(time(NULL));
+	while(maxIterations--)
+	{
+		pcl::PointXYZ point1;
+		pcl::PointXYZ point2;
+		pcl::PointXYZ point3;
+		std::unordered_set<int> temp;
+
+		point1 = cloud->points[rand()%cloud->points.size()];
+		point2 = cloud->points[rand()%cloud->points.size()];
+		point3 = cloud->points[rand()%cloud->points.size()];
+
+		float A = (point2.y - point1.y)* (point3.z - point1.z) - (point2.z - point1.z)*(point3.y - point1.y);
+		float B = (point2.z - point1.z)* (point3.x - point1.x) - (point2.x - point1.x)*(point3.z - point1.z);
+		float C = (point2.x - point1.x)* (point3.y - point1.y) - (point2.y - point1.y)*(point3.x - point1.x);
+		float D = - ( A * point1.x + B * point1.y + C * point1.z);
+
+		for(int i = 0; (cloud->points.size() - i) >0 ; i++)
+		{
+			float distance = abs(A*cloud->points[i].x + B*cloud->points[i].y + C*cloud->points[i].z + D )  / sqrt(A*A + B*B + C*C) ;
+			
+			if (distance < distanceThreshold)
+			{
+				temp.insert(i);
+			}
+		}
+
+
+		if(temp.size() > inliersResult.size())
+		{
+			inliersResult = temp;
+		}
+    }   
+
+    for (int idx : inliersResult)
+    {
+        inliers->indices.push_back(idx);
+    }
+    	
+	
+	
+	std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> segResult = SeparateClouds(inliers,cloud);
+    return segResult;
+
+}
+ 
+
 
 template<typename PointT>
 std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::Clustering(typename pcl::PointCloud<PointT>::Ptr cloud, float clusterTolerance, int minSize, int maxSize)
@@ -173,6 +229,54 @@ std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::C
 
     return clusters;
 }
+
+
+template<typename PointT>
+std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::Clustering_hyw(typename pcl::PointCloud<PointT>::Ptr cloud, float clusterTolerance, int minSize, int maxSize)
+{
+
+    // Time clustering process
+    auto startTime = std::chrono::steady_clock::now();
+
+    std::vector<typename pcl::PointCloud<PointT>::Ptr> clusters;
+    std::vector<std::vector<float>> points;
+    KdTree* tree = new KdTree;
+            
+		
+    for (int i = 0; i < cloud->points.size(); i++)
+    {
+        std::vector<float> point = {cloud->points[i].x, cloud->points[i].y, cloud->points[i].z};
+        points.push_back (point);
+        tree->insert(point, i);
+    }
+
+    // make clusters
+    std::vector<std::vector<int>> clusters_indices = euclideanCluster_hyw(points, tree, clusterTolerance, minSize, maxSize);
+    for (std::vector<int> cluster_indices : clusters_indices)
+    {
+        typename pcl::PointCloud<PointT>::Ptr cluster_cloud (new pcl::PointCloud<PointT>);
+        for (int idx : cluster_indices)
+        {
+            cluster_cloud->push_back((*cloud)[idx]);
+        }
+        cluster_cloud->width = cluster_cloud->size ();
+        cluster_cloud->height = 1;
+        cluster_cloud->is_dense = true;
+
+        clusters.push_back (cluster_cloud);
+    }
+    
+
+
+    auto endTime = std::chrono::steady_clock::now();
+    auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
+    std::cout << "clustering took " << elapsedTime.count() << " milliseconds and found " << clusters.size() << " clusters" << std::endl;
+
+    return clusters;
+}
+
+
+
 
 
 template<typename PointT>
@@ -280,3 +384,4 @@ std::vector<boost::filesystem::path> ProcessPointClouds<PointT>::streamPcd(std::
     return paths;
 
 }
+

@@ -1,8 +1,10 @@
-/* \author Aaron Brown */
-// Quiz on implementing kd tree
+#ifndef KDTREE_H_
+#define KDTREE_H_
 
-#include "../../render/render.h"
-
+//#include "../../render/render.h"
+#include <vector>
+#include <cmath>
+#include <unordered_set>
 
 // Structure to represent node of kd tree
 struct Node
@@ -95,10 +97,14 @@ struct KdTree
 
 		return ids;
 	}
+
+	
 	
 
 };
 
 
+std::vector<std::vector<int>> euclideanCluster_hyw(const std::vector<std::vector<float>>& points, KdTree* tree, float distanceTol, int minSize, int maxSize);
 
 
+#endif // KDTREE_H_

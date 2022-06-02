@@ -7,6 +7,8 @@
 #include "processPointClouds.h"
 // using templates for processPointClouds so also include .cpp to help linker
 #include "processPointClouds.cpp"
+#include "quiz/cluster/cluster.cpp"
+
 
 std::vector<Car> initHighway(bool renderScene, pcl::visualization::PCLVisualizer::Ptr& viewer)
 {
@@ -58,12 +60,14 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
     
     ProcessPointClouds<pcl::PointXYZ> *PointCloud = new ProcessPointClouds<pcl::PointXYZ>();
     std::pair<pcl::PointCloud<pcl::PointXYZ>::Ptr, pcl::PointCloud<pcl::PointXYZ>::Ptr> segmentCloud = PointCloud->SegmentPlane(inputCloud, 100, 0.2);
+    
     /*
     renderPointCloud(viewer,segmentCloud.first,"obstCloud",Color(1,0,0));
     renderPointCloud(viewer,segmentCloud.second,"planeCloud",Color(0,1,0));
     */
 
     std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters = PointCloud->Clustering(segmentCloud.first, 1.0, 3, 30);
+    
 
     int clusterId = 0;
     std::vector<Color> colors = {Color(1,0,0), Color(0,1,0), Color(0,0,1)};
@@ -102,7 +106,8 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer, ProcessPointCloud
 
     int maxIterations = 20;
     float distanceThreshold = 0.3;
-    std::pair<pcl::PointCloud<pcl::PointXYZ>::Ptr, pcl::PointCloud<pcl::PointXYZ>::Ptr> segmentCloud = pointProcessorI->SegmentPlane(filterCloud, maxIterations, distanceThreshold);
+    //std::pair<pcl::PointCloud<pcl::PointXYZ>::Ptr, pcl::PointCloud<pcl::PointXYZ>::Ptr> segmentCloud = pointProcessorI->SegmentPlane(filterCloud, maxIterations, distanceThreshold);
+    std::pair<pcl::PointCloud<pcl::PointXYZ>::Ptr, pcl::PointCloud<pcl::PointXYZ>::Ptr> segmentCloud = pointProcessorI->SegmentPlane_hyw(filterCloud, maxIterations, distanceThreshold);
     //renderPointCloud(viewer,segmentCloud.first,"obstCloud",Color(1,1,0));
     renderPointCloud(viewer,segmentCloud.second,"planeCloud",Color(0,1,0));
     
@@ -110,7 +115,8 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer, ProcessPointCloud
     float clusterTolerance = 0.5;
     int minSize = 10;
     int maxSize = 300;
-    std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters = pointProcessorI->Clustering(segmentCloud.first, clusterTolerance, minSize, maxSize);
+    //std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters = pointProcessorI->Clustering(segmentCloud.first, clusterTolerance, minSize, maxSize);
+    std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters = pointProcessorI->Clustering_hyw(segmentCloud.first, clusterTolerance, minSize, maxSize);
 
     int clusterId = 0;
     std::vector<Color> colors = {Color(1,0,0), Color(0,1,1), Color(0,0,1)};

@@ -1,15 +1,16 @@
 /* \author Aaron Brown */
 // Quiz on implementing simple RANSAC line fitting
 
-#include "../../render/render.h"
-#include "../../render/box.h"
-#include <chrono>
-#include <string>
+//#include "../../render/render.h"
+//#include "../../render/box.h"
+//#include <chrono>
+//#include <string>
 #include "kdtree.h"
 
 // Arguments:
 // window is the region to draw box around
 // increase zoom to see more of the area
+/*
 pcl::visualization::PCLVisualizer::Ptr initScene(Box window, int zoom)
 {
 	pcl::visualization::PCLVisualizer::Ptr viewer(new pcl::visualization::PCLVisualizer ("2D Viewer"));
@@ -44,6 +45,8 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr CreateData(std::vector<std::vector<float>> p
 }
 
 
+
+
 void render2DTree(Node* node, pcl::visualization::PCLVisualizer::Ptr& viewer, Box window, int& iteration, uint depth=0)
 {
 
@@ -74,7 +77,7 @@ void render2DTree(Node* node, pcl::visualization::PCLVisualizer::Ptr& viewer, Bo
 	}
 
 }
-
+*/
 
 void Proximity(int index, std::vector<int> &cluster, std::vector<bool> &processed, const std::vector<std::vector<float>> points, KdTree* tree, float distanceTol)
 {
@@ -89,7 +92,7 @@ void Proximity(int index, std::vector<int> &cluster, std::vector<bool> &processe
 		}
 
 }
-
+/*
 std::vector<std::vector<int>> euclideanCluster(const std::vector<std::vector<float>>& points, KdTree* tree, float distanceTol)
 {
 
@@ -114,7 +117,36 @@ std::vector<std::vector<int>> euclideanCluster(const std::vector<std::vector<flo
 	return clusters;
 
 }
+*/
+std::vector<std::vector<int>> euclideanCluster_hyw(const std::vector<std::vector<float>>& points, KdTree* tree, float distanceTol, int minSize, int maxSize)
+{
 
+	// TODO: Fill out this function to return list of indices for each cluster
+
+
+	std::vector<std::vector<int>> clusters; // list of clusters
+	std::vector<bool> processed(points.size(), false);
+	//pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>());
+	
+	for (int i = 0 ; i < points.size(); i++) 
+	{
+		if (processed[i] == false) // iterate through each point
+		{
+			std::vector<int> cluster;
+			Proximity(i, cluster, processed, points, tree, distanceTol);
+			 if (minSize <= cluster.size() && cluster.size() <= maxSize) // Check cluster size
+            {
+                clusters.push_back (cluster); // cluster add clusters
+            }
+		}
+
+	}
+
+	return clusters;
+
+}
+
+/*
 int main ()
 {
 
@@ -176,3 +208,4 @@ int main ()
   	}
   	
 }
+*/
