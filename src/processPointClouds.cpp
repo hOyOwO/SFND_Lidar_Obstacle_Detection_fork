@@ -255,6 +255,7 @@ std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::C
 
     // make clusters
     std::vector<std::vector<int>> clusters_indices = euclideanCluster_hyw(points, tree, clusterTolerance, minSize, maxSize);
+    
     for (std::vector<int> cluster_indices : clusters_indices)
     {
         typename pcl::PointCloud<PointT>::Ptr cluster_cloud (new pcl::PointCloud<PointT>);
@@ -268,9 +269,8 @@ std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::C
 
         clusters.push_back (cluster_cloud);
     }
+
     
-
-
     auto endTime = std::chrono::steady_clock::now();
     auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
     std::cout << "clustering took " << elapsedTime.count() << " milliseconds and found " << clusters.size() << " clusters" << std::endl;

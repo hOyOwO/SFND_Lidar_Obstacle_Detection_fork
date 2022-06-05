@@ -1,5 +1,5 @@
 #include "kdtree_hyw.h"
-
+#include <iostream> 
 /*
 void proximity(const std::vector<std::vector<float>>& points, int i, std::vector<int> *cluster, KdTree* tree, float distanceTol, std::vector<bool> *processed)
 {
@@ -22,12 +22,21 @@ void Proximity(int index, std::vector<int> &cluster, std::vector<bool> &processe
 	processed[index] = true;
 	cluster.push_back(index);
 	std::vector<int> nearby = tree->search(points[index],distanceTol);
-	for(int j : nearby)
+    
+
+	for(int j = 0 ; j < nearby.size(); j++)
     	{
-			if(processed[j] != true)
-				Proximity(j, cluster, processed, points, tree, distanceTol);
-			
+            
+
+			if(processed[nearby[j]] != true)
+            {
+                //std::cout << nearby.size() << std::endl;
+                Proximity(nearby[j], cluster, processed, points, tree, distanceTol);
+
+            }
+                
 		}
+    
 
 }
 
@@ -53,7 +62,7 @@ std::vector<std::vector<int>> euclideanCluster_hyw(const std::vector<std::vector
             }
 		}
 
-	}
+    }
 
 	return clusters;
 
