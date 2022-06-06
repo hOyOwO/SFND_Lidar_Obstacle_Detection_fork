@@ -141,9 +141,28 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
 		pcl::PointXYZ point3;
 		std::unordered_set<int> temp;
 
+// to make unique point
+        std::unordered_set<int> indices;
+        while (indices.size() < 3) {
+        indices.insert(rand() % cloud->points.size());
+        }
+        //Then to get the three unique indices:
+
+        auto itr = indices.begin();
+        const int ind1 = *itr++;
+        const int ind2 = *itr++;
+        const int ind3 = *itr;
+
+        point1 = cloud->points[ind1];
+		point2 = cloud->points[ind2];
+		point3 = cloud->points[ind3];
+
+/*
 		point1 = cloud->points[rand()%cloud->points.size()];
 		point2 = cloud->points[rand()%cloud->points.size()];
 		point3 = cloud->points[rand()%cloud->points.size()];
+*/
+
 
 		float A = (point2.y - point1.y)* (point3.z - point1.z) - (point2.z - point1.z)*(point3.y - point1.y);
 		float B = (point2.z - point1.z)* (point3.x - point1.x) - (point2.x - point1.x)*(point3.z - point1.z);
