@@ -1,22 +1,6 @@
 #include "kdtree_hyw.h"
 #include <iostream> 
-/*
-void proximity(const std::vector<std::vector<float>>& points, int i, std::vector<int> *cluster, KdTree* tree, float distanceTol, std::vector<bool> *processed)
-{
-	(*processed)[i] = true; // mark point as processed
-	cluster->push_back (i); // add point to cluster
-	
-	std::vector<int> nearby = tree->search(points[i], distanceTol); // nearby points = tree(point)
 
-	for (int j = 0; j < nearby.size(); j++) // Iterate through each nearby point
-	{
-		if (!(*processed)[nearby[j]]) // If point has not been processed
-		{
-			proximity(points, nearby[j], cluster, tree, distanceTol, processed); // Proximity(cluster)
-		}
-	}
-}
-*/
 void Proximity(int index, std::vector<int> &cluster, std::vector<bool> &processed, const std::vector<std::vector<float>> points, KdTree* tree, float distanceTol)
 {
 	processed[index] = true;

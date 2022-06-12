@@ -101,20 +101,20 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer, ProcessPointCloud
     //ProcessPointClouds<pcl::PointXYZ>* pointProcessorI = new ProcessPointClouds<pcl::PointXYZ>();
     //pcl::PointCloud<pcl::PointXYZ>::Ptr inputCloud = pointProcessorI->loadPcd("../src/sensors/data/pcd/data_1/0000000000.pcd");
     //renderPointCloud(viewer,inputCloud,"inputCloud");
-    pcl::PointCloud<pcl::PointXYZ>::Ptr filterCloud = pointProcessorI->FilterCloud(inputCloud, 0.3 , Eigen::Vector4f (-15, -6, -3, 1), Eigen::Vector4f (15, 6, 5, 1));
+    pcl::PointCloud<pcl::PointXYZ>::Ptr filterCloud = pointProcessorI->FilterCloud(inputCloud, 0.23 , Eigen::Vector4f (-15, -6, -3, 1), Eigen::Vector4f (15, 6, 5, 1));
     //renderPointCloud(viewer,filterCloud,"filterCloud");
 
     int maxIterations = 20;
-    float distanceThreshold = 0.3;
+    float distanceThreshold = 0.4;
     //std::pair<pcl::PointCloud<pcl::PointXYZ>::Ptr, pcl::PointCloud<pcl::PointXYZ>::Ptr> segmentCloud = pointProcessorI->SegmentPlane(filterCloud, maxIterations, distanceThreshold);
     std::pair<pcl::PointCloud<pcl::PointXYZ>::Ptr, pcl::PointCloud<pcl::PointXYZ>::Ptr> segmentCloud = pointProcessorI->SegmentPlane_hyw(filterCloud, maxIterations, distanceThreshold);
     //renderPointCloud(viewer,segmentCloud.first,"obstCloud",Color(1,1,0));
     renderPointCloud(viewer,segmentCloud.second,"planeCloud",Color(0,1,0));
     
     
-    float clusterTolerance = 0.5;
+    float clusterTolerance = 0.4;
     int minSize = 10;
-    int maxSize = 200;
+    int maxSize = 400;
     //std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters = pointProcessorI->Clustering(segmentCloud.first, clusterTolerance, minSize, maxSize);
     std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters = pointProcessorI->Clustering_hyw(segmentCloud.first, clusterTolerance, minSize, maxSize);
 
